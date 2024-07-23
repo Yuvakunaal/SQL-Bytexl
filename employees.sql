@@ -105,3 +105,33 @@ timestampdiff(year,date_of_birth,now()) as age,
 60 - timestampdiff(year,date_of_birth,now()) as rem_years_for_retirement
 from employees
 where last_name like '%l';
+
+-- Display first_name, last_name, DOB, age, No of years left for retirement (assume age of retirement : 60),
+-- experience, total_service, experience_service
+select first_name,last_name,date_of_birth,
+timestampdiff(year,date_of_birth,now()) as age,
+60 - timestampdiff(year,date_of_birth,now()) as rem_years_for_retirement,
+timestampdiff(year,joining_date,now()) as experience,
+60 - timestampdiff(year,date_of_birth,now()) + timestampdiff(year,joining_date,now()) as total_service,
+timestampdiff(year,joining_date,now()) / (60 - timestampdiff(year,date_of_birth,now()) + timestampdiff(year,joining_date,now()))*100 as experience_service_perc
+from employees;
+
+-- Look at the above query, it is simple but we made it somewhat complex...to avoid this,we use views...
+-- Views :-
+-- view is named and stored query & view can be seein in table.
+create view employee_service
+as 
+select employees.*,
+timestampdiff(year,date_of_birth,now()) as age,
+60 - timestampdiff(year,date_of_birth,now()) as rem_years_for_retirement,
+timestampdiff(year,joining_date,now()) as experience,
+60 - timestampdiff(year,date_of_birth,now()) + timestampdiff(year,joining_date,now()) as total_service
+from employees
+
+select * from employee_service;
+
+-- Now we can use the view to do employee_service_perc
+select first_name,last_name,age,joining_date,rem_years_for_retirement,experience,total_service,
+(experience/total_service)*100 as experience_service_perc
+from employee_service
+order by age;
